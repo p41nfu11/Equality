@@ -1,0 +1,75 @@
+extends layout
+
+block content
+	h1= title
+	p Welcome #{user.name}
+
+
+	h4 Daily tasks
+
+	table(class='table table-striped')
+		thead
+		tbody(data-bind="foreach: dailyTasks")
+			tr
+				td
+					input(type='checkbox',data-bind='checked:completed,click:$parent.checkboxClicked')
+				td
+					span(data-bind="text: title")
+			
+				td
+					button(class='btn btn-mini',type='button', data-bind='click:$parent.delTask, visible:$parent.edit')
+						i(class="icon-remove")
+
+	br
+	form(class='form')
+		input(ID='title', data-bind='value: titleDaily',placeholder="New task", class='input-medium')
+		button(data-bind='click:function(){addTaskWasClicked(false)}', class='btn') Add
+
+	br
+
+	h4 Longer tasks
+
+	table(class='table table-striped')
+		thead
+		tbody(data-bind="foreach: longerTasks")
+			tr
+				td
+					input(type='checkbox',data-bind='checked:completed,click:$parent.checkboxClicked')
+				td
+					span(data-bind="text: title")
+			
+				td
+					button(class='btn btn-mini',type='button', data-bind='click:$parent.delTask, visible:$parent.edit')
+						i(class="icon-remove")
+
+	br
+	form(class='form')
+		input(ID='title', data-bind='value: titleLong',placeholder="New task", class='input-medium')
+		button(data-bind='click: function(){addTaskWasClicked(true)}', class='btn') Add
+		
+	br	
+	hr
+	h4 Completed
+	br
+	table(class='table table-striped')
+		thead
+		tbody(data-bind="foreach: completedTasks")
+			tr
+				td
+					input(type='checkbox',data-bind='checked:completed,click:$parent.checkboxClicked')
+				td
+					span(data-bind="text: title")
+			
+				td
+					button(class='btn btn-mini',type='button', data-bind='click:$parent.delTask, visible:$parent.edit')
+						i(class="icon-remove")
+
+
+	'editable' 
+	input(type='checkbox',data-bind='checked:edit')
+	br
+	a(href="/logout") Logout
+
+
+	script(src='knockout/knockout-2.2.1.debug.js', type='text/javascript')
+	script(src='js/app.js', type='text/javascript')

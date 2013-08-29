@@ -1,0 +1,80 @@
+extends layout
+
+block content
+	script(type="text/html", id="taskTemplate")
+		tr
+			td
+				input(type='checkbox',data-bind='checked:completed,click:$parent.checkboxClicked')
+			td
+				<!-- ko ifnot: editActive -->
+				span(class="badge badge-important", data-bind="if: $parent.isDue($data)") due
+				&nbsp;
+				span(data-bind="text: title")
+				<!-- /ko -->
+				<!-- ko if: editActive -->
+				form(class='form')
+					input(ID='title', data-bind='value: title',placeholder="edit title", class='input-medium')
+					button(data-bind='click:function(){$parent.editTask($data)}', class='btn') Edit
+				<!-- /ko -->
+
+			td
+				button(class='btn btn-mini',type='button', data-bind='click:$parent.snoozeTaskWasClicked, visible:$parent.isDue($data)')
+					i(class="icon-time")
+			td	
+				button(class='btn btn-mini',type='button', data-bind='click: $parent.editButtonWasClicked')
+					i(class="icon-pencil")
+			td
+				button(class='btn btn-mini',type='button', data-bind='click:$parent.removeTask, visible:$parent.edit')
+					i(class="icon-remove")
+
+				
+	script(type="text/html", id="completeTaskTemplate")
+		tr
+			td
+				input(type='checkbox',data-bind='checked:completed,click:$parent.checkboxClicked')
+			td
+				span(data-bind="text: title")
+			td
+				button(class='btn btn-mini',type='button', data-bind='click:$parent.removeTask, visible:$parent.edit')
+					i(class="icon-remove")
+
+	h1= title
+	div(class='span12')	
+		div(class='span6')
+			h4 Daily tasks
+
+			table(class='table table-striped')
+				thead
+
+				tbody(data-bind="template: { name: 'taskTemplate', foreach: tasks}")
+
+			br
+			form(class='form')
+				input(ID='title', data-bind='value: title',placeholder="New task", class='input-medium')
+				button(data-bind='click:function(){addTaskWasClicked()}', class='btn') Add
+
+		
+		br	
+		div(class='span6', data-bind='visible: completedTasks().length > 0')
+			h4 Completed
+			br
+			table(class='table table-striped')
+				thead
+				tbody(data-bind="template: { name: 'completeTaskTemplate', foreach: completedTasks}")
+
+
+		div(class='span6')		
+			div(class="span3")
+				input(type='checkbox',data-bind='checked:edit') Deletable
+
+			br
+			br
+			span(data-bind="visible:edit") To join list:
+			span(data-bind="visible:edit, text:listId")
+
+		script(type="text/javascript")
+			parameter = {"id": '#{listId}'}
+
+		script(src='/knockout/knockout-2.2.1.debug.js', type='text/javascript')
+		script(src='/js/list.js', type='text/javascript')
+

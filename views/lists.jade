@@ -8,11 +8,11 @@ block content
 				a(data-bind="attr: { href: '/list/' + _id, title: title }")
 					span(data-bind="text: title") 
 			td
-				button(class='btn btn-xs',type='button', data-bind='click: $parent.removeList')
-					span(class="glyphicon glyphicon-remove")
-			td
 				button(class="btn btn-xs", type="button", data-bind='click:$parent.share')
 					span(class="glyphicon glyphicon-share")
+			td
+				button(class='btn btn-xs',type='button', data-bind='click: $parent.removeList')
+					span(class="glyphicon glyphicon-remove")
 
 	div(class='container')
 		h2 Make something that counts..
@@ -24,6 +24,10 @@ block content
 
 					table(class='table table-striped')
 						thead
+							tr
+								th title
+								th share
+								th remove
 						tbody(data-bind="template: { name: 'listTemplate', foreach: lists}")
 
 				div(class='col-md-4', data-bind="if:!listToShare()")

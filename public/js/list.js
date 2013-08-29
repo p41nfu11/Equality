@@ -37,6 +37,7 @@ function ListViewModel() {
     	$.get('/api/user/', function(data) {
     		data.forEach(function (e){
                 e.avatar = "https://graph.facebook.com/"+ e.fbUserName + "/picture";
+                e.points = ko.observable(e.points);
     			self.users.push(e);	
     		});
     	});
@@ -119,9 +120,20 @@ function ListViewModel() {
             self.removeTaskFromList(data);
             completedTask.editActive = ko.observable(false);
             self.addTaskToList(completedTask);
-            var index = self.users().indexOf(completedTask.completedBy);
+            var index = -1;
+            for (var i = 0; i < self.users().length; i ++)
+            {
+                if (self.users()[i]._id === completedTask.completedBy){
+                    index = i;
+                    break;
+                }
+            }
             if (index > -1){
-                self.users()[index].points
+                var updatingUser = self.users()[index]; 
+                if (completedTask.completed)
+                    updatingUser.points(updatingUser.points() + completedTask.points);
+                else
+                    updatingUser.points(updatingUser.points() - completedTask.points);
             }
         }); 
         //returns true so as to notify the checkbox to mark/unmark itself (can not be done in callback)

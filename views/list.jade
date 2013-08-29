@@ -20,13 +20,13 @@ block content
 				span(data-bind="text: points")
 				span(class="glyphicon glyphicon-star")
 			td
-				button(class='btn btn-mini',type='button', data-bind='click:$parent.snoozeTaskWasClicked, visible:$parent.isDue($data)')
+				button(class='btn btn-xs',type='button', data-bind='click:$parent.snoozeTaskWasClicked, visible:$parent.isDue($data)')
 					span(class="glyphicon glyphicon-time")
 			td	
-				button(class='btn btn-mini',type='button', data-bind='click: $parent.editButtonWasClicked')
+				button(class='btn btn-xs',type='button', data-bind='click: $parent.editButtonWasClicked')
 					span(class="glyphicon glyphicon-pencil")
 			td
-				button(class='btn btn-mini',type='button', data-bind='click:$parent.removeTask, visible:$parent.edit')
+				button(class='btn btn-xs',type='button', data-bind='click:$parent.removeTask, visible:$parent.edit')
 					span(class="glyphicon glyphicon-remove")
 
 				
@@ -40,7 +40,7 @@ block content
 				span(data-bind="text: points")
 				span(class="glyphicon glyphicon-star")
 			td
-				button(class='btn btn-mini',type='button', data-bind='click:$parent.removeTask, visible:$parent.edit')
+				button(class='btn btn-xs',type='button', data-bind='click:$parent.removeTask, visible:$parent.edit')
 					span(class="glyphicon glyphicon-remove")
 
 	h1= title

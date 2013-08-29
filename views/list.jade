@@ -21,14 +21,14 @@ block content
 					span(data-bind="text: points")
 					span(class="glyphicon glyphicon-star")
 				td
-					button(class='btn btn-xs',type='button', data-bind='click:$parent.snoozeTaskWasClicked, visible:$parent.isDue($data)')
-						span(class="glyphicon glyphicon-time")
-				td	
-					button(class='btn btn-xs',type='button', data-bind='click: $parent.editButtonWasClicked')
-						span(class="glyphicon glyphicon-pencil")
-				td
-					button(class='btn btn-xs',type='button', data-bind='click:$parent.removeTask')
-						span(class="glyphicon glyphicon-remove")
+					div(class="btn-group btn-group-sm")
+						button(class='btn btn-default btn-xs',type='button', data-bind='click:$parent.snoozeTaskWasClicked, visible:$parent.isDue($data)')
+							span(class="glyphicon glyphicon-time")
+						button(class='btn btn-default btn-xs',type='button', data-bind='click: $parent.editButtonWasClicked')
+							span(class="glyphicon glyphicon-pencil")
+						button(class='btn btn-default btn-xs',type='button', data-bind='click:$parent.removeTask')
+							span(class="glyphicon glyphicon-remove")
+					
 
 					
 		script(type="text/html", id="completeTaskTemplate")
@@ -48,7 +48,7 @@ block content
 		div(class='col-md-12')
 			h2 Get going, do some good..
 			div(class="row")
-				div(class='col-md-8')
+				div(class='col-md-7')
 					div(class="well")
 						h4 Tasks
 
@@ -57,17 +57,26 @@ block content
 
 							tbody(data-bind="template: { name: 'taskTemplate', foreach: tasks}")
 
-				div(class="col-md-4")
+				div(class="col-md-5")
 					div(class="well")
 						form(class='form')
 							div(class="form-group")
 								input(ID='title', data-bind='value: title',placeholder="New task", class='form-control')
 							div(class="form-group")
 								div(class="input-group")
-									input(type="text",class="form-control", data-bind="value: points")
-									span(class="input-group-addon") points
+									div(class="btn-group btn-group-sm")
+										span(class="btn", data-bind="css:{'btn-default': points() !== 1, 'btn-success': points() === 1}, click: function(){self.points(1);}") 1
+										span(class="btn", data-bind="css:{'btn-default': points() !== 2, 'btn-success': points() === 2}, click: function(){self.points(2);}") 2
+										span(class="btn", data-bind="css:{'btn-default': points() !== 3, 'btn-success': points() === 3}, click: function(){self.points(3);}") 3
+										span(class="btn", data-bind="css:{'btn-default': points() !== 5, 'btn-success': points() === 5}, click: function(){self.points(5);}") 5
+										span(class="btn", data-bind="css:{'btn-default': points() !== 8, 'btn-success': points() === 8}, click: function(){self.points(8);}") 8
+										span(class="btn", data-bind="css:{'btn-default': points() !== 16, 'btn-success': points() === 16}, click: function(){self.points(16);}") 16
+										span(class="btn", data-bind="css:{'btn-default': points() !== 32, 'btn-success': points() === 32}, click: function(){self.points(32);}") 32
+										span(class="btn", data-bind="css:{'btn-default': points() !== 64, 'btn-success': points() === 64}, click: function(){self.points(64);}") 64
+										span(class="btn btn-warning glyphicon glyphicon-star", disabled="disabled")
+									
 							div(class="form-group")
-								button(data-bind='click:function(){addTaskWasClicked()}', class='btn') Add
+								button(data-bind='click:function(){addTaskWasClicked()}, enable: points() && title()', class='btn') Add
 
 
 			div(class="row")
@@ -77,7 +86,7 @@ block content
 						img(data-bind="attr:{src: avatar}", style="border-radius:30px;border: 1px solid #000000;float:left;margin-right: 10px;")
 						span(data-bind="text: name", style="font-weight: bold;")
 						br
-						span(class="label label-warning glyphicon glyphicon-star",data-bind="text: points")
+						span(class="label label-warning glyphicon glyphicon-star",data-bind="text: $parent.getPointsForUser($data)")
 						br
 						br
 						div(class='span6') <!--//, data-bind='visible: $parent.completedTasksMatrix()[$index].length > 0'-->	

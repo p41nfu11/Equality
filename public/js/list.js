@@ -178,6 +178,16 @@ function ListViewModel() {
             self.removeTaskFromList(task);
         });
     }
+
+    self.getPointsForUser = function(user){
+        var points = 0;
+        self.completedTasks().forEach(function(task){
+            if (task.completedBy === user._id){
+                points += task.points;
+            }
+        });
+        return points;
+    }
 };
 
 ko.applyBindings(new ListViewModel());

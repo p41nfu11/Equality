@@ -1,7 +1,6 @@
 var mongoose = require('mongoose');
 var config = require('../config');
 
-console.log(config);
 
 var taskSchema = new mongoose.Schema({
 	title: String,
@@ -9,6 +8,8 @@ var taskSchema = new mongoose.Schema({
 	createdDate: Date,
 	dueDate: Date,
 	completed: Boolean,
+	completedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+	points: Number
 });
 
 

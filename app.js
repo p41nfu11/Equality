@@ -22,6 +22,9 @@ var passport = require('passport'),
 	facebookStrategy = require('passport-facebook').Strategy;
 
 
+console.log("EQUALITY SERVER");
+console.log("starting...");
+
 //setting for passport
 passport.serializeUser(function(user,done)
 {
@@ -56,12 +59,15 @@ passport.use(new facebookStrategy({
 					newUser.fbId = profile.id;
 					newUser.name = profile.displayName;
 					newUser.email = profile.emails[0].value;
+					newUser.fbUserName = profile.username;
+					newUser.points = 0;
 					console.log(newUser);
 					newUser.save(function(err){
 						if(err){
 							throw err;
 						}
 						console.log("New user " + newUser.name + " was created");
+						console.log(profile.username);
 						done(null, newUser);
 					});
 				}
@@ -115,6 +121,8 @@ app.get('/api/user/', ensureAuthenticated, userApi.users);
 app.get('/api/task/', ensureAuthenticated, api.tasks);
 app.post('/api/task', ensureAuthenticated, api.addTask);
 app.post('/api/updateTask/', ensureAuthenticated, api.updateTask);
+app.post('/api/completeTask/', ensureAuthenticated, api.completeTask);
+
 
 app.get('/api/tasks/:id', api.tasksByList);
 
@@ -137,7 +145,7 @@ app.get('/error', function(req,res){
 });
 
 http.createServer(app).listen(app.get('port'), function(){
-  console.log('Kaizen server listening on port ' + app.get('port'));
+  console.log('Equality listening on port ' + app.get('port'));
 });
 
 function ensureAuthenticated(req, res, next) {

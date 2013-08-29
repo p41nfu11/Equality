@@ -3,12 +3,27 @@ function ListViewModel() {
     self = this;
 
     self.listId = ko.observable();
-    self.owners = ko.observableArray();
+    //self.owners = ko.observableArray();
     self.users = ko.observableArray();
     self.tasks = ko.observableArray();
     self.completedTasks = ko.observableArray();
     self.edit = ko.observable(false);
     self.title = ko.observable('');
+    self.points = ko.observable('');
+
+    self.completedTasksMatrix = ko.computed(function() {
+        var perUser = [];
+        for(var i = 0; i < self.users().length; i ++){
+            var usersTasks = [];
+            self.completedTasks().forEach(function(task){
+                if (task.completedBy === self.users()[i]._id)
+                    usersTasks.push(task);
+            });
+            perUser.push(usersTasks);
+        }
+        return perUser;
+    }, this);
+
 
     //edit
     self.editTaskTitle = ko.observable('');
@@ -21,6 +36,7 @@ function ListViewModel() {
 
     	$.get('/api/user/', function(data) {
     		data.forEach(function (e){
+                e.avatar = "https://graph.facebook.com/"+ e.fbUserName + "/picture";
     			self.users.push(e);	
     		});
     	});
@@ -38,9 +54,10 @@ function ListViewModel() {
 
     self.init();
 
-    self.removeTaskFromList = function(task, fromCompletedList)
+    self.removeTaskFromList = function(task)
     {
-        if (fromCompletedList)
+
+        if (self.completedTasks.indexOf(task) >= 0)
         {
             var index = self.completedTasks.indexOf(task);
             self.completedTasks.splice(index, 1);
@@ -65,20 +82,27 @@ function ListViewModel() {
     }
 
     self.addTaskWasClicked = function(){
+        if (isNaN(self.points())){
+            console.log("NaN");
+            return;
+        }
+
         var today = new Date();
-        var tomorrow = new Date(Date.parse(new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1)));
+        var nextWeek = new Date(Date.parse(new Date(today.getFullYear(), today.getMonth(), today.getDate() + 7)));
         
-        var newTask = {title: self.title, createdDate: new Date(), completed: false, dueDate: tomorrow};
+        var newTask = {title: self.title, createdDate: new Date(), completed: false, dueDate: nextWeek, points: self.points};
         $.post('/api/task', {task:newTask, listId: parameter.id}, function(data) {
-            
+            data.editActive = ko.observable(false);    
             self.addTaskToList(data);
             self.title('');
+            self.points('');
         }); 
+        
+
     };
 
     self.snoozeTaskWasClicked = function(task)
     {   
-
         var today = new Date();
         var threeDays = new Date(Date.parse(new Date(today.getFullYear(), today.getMonth(), today.getDate() + 3)));
 
@@ -91,9 +115,14 @@ function ListViewModel() {
     }
 
     self.checkboxClicked = function(data){
-        $.post('/api/updateTask/', data, function(updatedTask) {
-            self.removeTaskFromList(data, !data.completed);
-            self.addTaskToList(data);
+        $.post('/api/completeTask/', data, function(completedTask) {
+            self.removeTaskFromList(data);
+            completedTask.editActive = ko.observable(false);
+            self.addTaskToList(completedTask);
+            var index = self.users().indexOf(completedTask.completedBy);
+            if (index > -1){
+                self.users()[index].points
+            }
         }); 
         //returns true so as to notify the checkbox to mark/unmark itself (can not be done in callback)
         return true;

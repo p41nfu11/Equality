@@ -17,7 +17,7 @@ exports.users = function(req, res){
 			var cleanedList = [];
 
 			users.forEach(function(userData){
-				cleanedList.push({_id: userData._id, name: userData.name});
+				cleanedList.push({_id: userData._id, name: userData.name, fbUserName: userData.fbUserName, points: userData.points});
 			});
 
 			res.send(cleanedList);

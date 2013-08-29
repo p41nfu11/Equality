@@ -10,6 +10,7 @@
     "jade": "*",
     "passport": "*",
     "passport-facebook": "*",
-    "mongoose": "3.6.5"
+    "mongoose": "3.6.5",
+    "node-mandrill": "*"
   }
 }

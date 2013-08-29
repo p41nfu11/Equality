@@ -21,6 +21,7 @@ var user = require('./models/user');
 var passport = require('passport'),
 	facebookStrategy = require('passport-facebook').Strategy;
 
+var mandrill = require('node-mandrill')(config.dev.mandrill.apiKey);
 
 console.log("EQUALITY SERVER");
 console.log("starting...");
@@ -105,7 +106,9 @@ app.get('/lists', ensureAuthenticated, routes.lists);
 
 app.post('/api/list/', ensureAuthenticated, api.addList);
 app.post('/api/listAddOwner/', ensureAuthenticated, api.listAddOwner);
-
+app.get('/api/connectToList/:id', ensureAuthenticated, api.listConnectToUser);
+app.get('/api/list/:id', ensureAuthenticated, api.list);
+app.get('/api/owners/:id', ensureAuthenticated, api.owners);
 app.get('/list/:id', ensureAuthenticated, routes.showList);
 
 app.get('/api/lists/', api.lists);
@@ -122,6 +125,26 @@ app.get('/api/task/', ensureAuthenticated, api.tasks);
 app.post('/api/task', ensureAuthenticated, api.addTask);
 app.post('/api/updateTask/', ensureAuthenticated, api.updateTask);
 app.post('/api/completeTask/', ensureAuthenticated, api.completeTask);
+
+app.post('/api/sendInvite/', ensureAuthenticated, function(request, response) {
+	console.log(request.body);
+	mandrill('/messages/send', {
+    message: {
+        to: [{email: request.body.mailTo, name: ''}],
+        from_email: config.dev.mandrill.fromMail,
+        subject: "Get Equal!",
+        text: request.body.mailContent
+    }
+}, function(error, response)
+{
+    //uh oh, there was an error
+    if (error) console.log( JSON.stringify(error) );
+
+    //everything's good, lets see what mandrill said
+    else console.log(response);
+});
+	response.send(200);
+});
 
 
 app.get('/api/tasks/:id', api.tasksByList);
@@ -150,6 +173,6 @@ http.createServer(app).listen(app.get('port'), function(){
 
 function ensureAuthenticated(req, res, next) {
     if (req.isAuthenticated()) { return next(); }
-    res.redirect('/error');
+    res.redirect('/');
 }
 

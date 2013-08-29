@@ -27,6 +27,38 @@ exports.lists = function(req, res){
 	});
 };
 
+exports.owners = function(req, res){
+	var listId = req.params.id;
+  	process.nextTick(function(){
+		var query = list.findOne({ '_id': listId }).populate('owners');
+		query.exec(function(err, list){
+			if(err)
+			{
+				console.log('err trying to find list');	
+				res.send(404);
+			}
+			console.log(list);
+			res.send(list.owners);
+		});
+	});
+};
+
+exports.list = function(req, res){
+	var listId = req.params.id;
+  	process.nextTick(function(){
+		var query = list.findOne({ '_id': listId });
+		query.exec(function(err, list){
+			if(err)
+			{
+				console.log('err trying to find list');	
+				res.send(404);
+			}
+			console.log(list);
+			res.send(list);
+		});
+	});
+};
+
 exports.tasksByList = function(req, res){
   	process.nextTick(function(){
 		var query = list.findOne({ '_id': req.params.id }).populate('tasks');
@@ -50,12 +82,12 @@ exports.addList = function (request, response) {
     newList.createdDate = listData.createdDate || new Date();
     newList.owners.push(request.user);
 
-    newList.save(function(err){
+    newList.save(function(err, savedList){
 		if(err){
 			throw err;
 		}
-		console.log("New task " + newList.title + " was created");
-		response.send(200, newList);
+		console.log("New task " + savedList.title + " was created");
+		response.send(200, savedList);
 	});	
 };
 
@@ -120,6 +152,30 @@ exports.listAddOwner = function (request, response) {
 				throw err;
 			}
 			console.log("list was saved");
+		});	
+	});
+};
+
+exports.listConnectToUser = function (request, response) {
+	var userId = request.user._id; 
+	var listId = request.params.id;
+
+	console.log('user = ' + userId);
+	console.log(listId);
+	var query = list.findOne({ '_id': listId });
+	query.exec(function(err, list){
+		if(err)
+		{
+			console.log('err trying to find list');	
+			response.send(404);
+		}
+		list.owners.push(userId);
+		list.save(function(err){
+			if(err){
+				throw err;
+			}
+			console.log("list was saved");
+			response.send(200);
 		});	
 	});
 };
@@ -227,3 +283,4 @@ exports.removeTask = function (request, response) {
 	    }
 	});	
 };
+

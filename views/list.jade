@@ -1,100 +1,93 @@
 extends layout
 
 block content
-	script(type="text/html", id="taskTemplate")
-		tr
-			td
-				input(type='checkbox',data-bind='checked:completed,click:$parent.checkboxClicked')
-			td
-				<!-- ko ifnot: editActive -->
-				span(class="badge badge-important", data-bind="if: $parent.isDue($data)") due
-				&nbsp;
-				span(data-bind="text: title")
-				<!-- /ko -->
-				<!-- ko if: editActive -->
-				form(class='form')
-					input(ID='title', data-bind='value: title',placeholder="edit title", class='input-medium')
-					button(data-bind='click:function(){$parent.editTask($data)}', class='btn') Edit
-				<!-- /ko -->
-			td
-				span(data-bind="text: points")
-				span(class="glyphicon glyphicon-star")
-			td
-				button(class='btn btn-xs',type='button', data-bind='click:$parent.snoozeTaskWasClicked, visible:$parent.isDue($data)')
-					span(class="glyphicon glyphicon-time")
-			td	
-				button(class='btn btn-xs',type='button', data-bind='click: $parent.editButtonWasClicked')
-					span(class="glyphicon glyphicon-pencil")
-			td
-				button(class='btn btn-xs',type='button', data-bind='click:$parent.removeTask, visible:$parent.edit')
-					span(class="glyphicon glyphicon-remove")
-
-				
-	script(type="text/html", id="completeTaskTemplate")
-		tr
-			td
-				input(type='checkbox',data-bind='checked:completed,click:$root.checkboxClicked')
-			td
-				span(data-bind="text: title")
-			td
-				span(data-bind="text: points")
-				span(class="glyphicon glyphicon-star")
-			td
-				button(class='btn btn-xs',type='button', data-bind='click:$parent.removeTask, visible:$parent.edit')
-					span(class="glyphicon glyphicon-remove")
-
-	h1= title
-	div(class='col-md-12')
-		div(class="row")
-			div(class='col-md-8')
-				div(class="well")
-					h4 Tasks
-
-					table(class='table table-striped')
-						thead
-
-						tbody(data-bind="template: { name: 'taskTemplate', foreach: tasks}")
-
-			div(class="col-md-4")
-				div(class="well")
+	div(class='container')
+		script(type="text/html", id="taskTemplate")
+			tr
+				td
+					input(type='checkbox',data-bind='checked:completed,click:$parent.checkboxClicked')
+				td
+					<!-- ko ifnot: editActive -->
+					span(class="badge badge-important", data-bind="if: $parent.isDue($data)") due
+					&nbsp;
+					span(data-bind="text: title")
+					<!-- /ko -->
+					<!-- ko if: editActive -->
 					form(class='form')
-						div(class="form-group")
-							input(ID='title', data-bind='value: title',placeholder="New task", class='form-control')
-						div(class="form-group")
-							div(class="input-group")
-								input(type="text",class="form-control", data-bind="value: points")
-								span(class="input-group-addon") points
-						div(class="form-group")
-							button(data-bind='click:function(){addTaskWasClicked()}', class='btn') Add
+						input(ID='title', data-bind='value: title',placeholder="edit title", class='input-medium')
+						button(data-bind='click:function(){$parent.editTask($data)}', class='btn') Edit
+					<!-- /ko -->
+				td
+					span(data-bind="text: points")
+					span(class="glyphicon glyphicon-star")
+				td
+					button(class='btn btn-xs',type='button', data-bind='click:$parent.snoozeTaskWasClicked, visible:$parent.isDue($data)')
+						span(class="glyphicon glyphicon-time")
+				td	
+					button(class='btn btn-xs',type='button', data-bind='click: $parent.editButtonWasClicked')
+						span(class="glyphicon glyphicon-pencil")
+				td
+					button(class='btn btn-xs',type='button', data-bind='click:$parent.removeTask')
+						span(class="glyphicon glyphicon-remove")
 
+					
+		script(type="text/html", id="completeTaskTemplate")
+			tr
+				td
+					input(type='checkbox',data-bind='checked:completed,click:$root.checkboxClicked')
+				td
+					span(data-bind="text: title")
+				td
+					span(data-bind="text: points")
+					span(class="glyphicon glyphicon-star")
+				td
+					button(class='btn btn-xs',type='button', data-bind='click:$parent.removeTask, visible:$parent.edit')
+						span(class="glyphicon glyphicon-remove")
 
-		div(class="row")
-			<!-- ko foreach: users() -->
-			div(class="col-md-6")
-				div(class="well")
-					img(data-bind="attr:{src: avatar}", style="border-radius:30px;border: 1px solid #000000;float:left;margin-right: 10px;")
-					span(data-bind="text: name", style="font-weight: bold;")
-					br
-					span(class="label label-warning glyphicon glyphicon-star",data-bind="text: points")
-					br
-					br
-					div(class='span6') <!--//, data-bind='visible: $parent.completedTasksMatrix()[$index].length > 0'-->	
-						h5 Completed tasks
-						br
+		
+		div(class='col-md-12')
+			h2 Get going, do some good..
+			div(class="row")
+				div(class='col-md-8')
+					div(class="well")
+						h4 Tasks
+
 						table(class='table table-striped')
 							thead
-							tbody(data-bind="template: { name: 'completeTaskTemplate', foreach: $parent.completedTasksMatrix()[$index()]}")
-			<!-- /ko -->
-		div(class="row")
-			div(class='col-md-6')		
-				div(class="col-md-3")
-					input(type='checkbox',data-bind='checked:edit') Deletable
 
-				br
-				br
-				span(data-bind="visible:edit") To join list:
-				span(data-bind="visible:edit, text:listId")
+							tbody(data-bind="template: { name: 'taskTemplate', foreach: tasks}")
 
+				div(class="col-md-4")
+					div(class="well")
+						form(class='form')
+							div(class="form-group")
+								input(ID='title', data-bind='value: title',placeholder="New task", class='form-control')
+							div(class="form-group")
+								div(class="input-group")
+									input(type="text",class="form-control", data-bind="value: points")
+									span(class="input-group-addon") points
+							div(class="form-group")
+								button(data-bind='click:function(){addTaskWasClicked()}', class='btn') Add
+
+
+			div(class="row")
+				<!-- ko foreach: users() -->
+				div(class="col-md-6")
+					div(class="well")
+						img(data-bind="attr:{src: avatar}", style="border-radius:30px;border: 1px solid #000000;float:left;margin-right: 10px;")
+						span(data-bind="text: name", style="font-weight: bold;")
+						br
+						span(class="label label-warning glyphicon glyphicon-star",data-bind="text: points")
+						br
+						br
+						div(class='span6') <!--//, data-bind='visible: $parent.completedTasksMatrix()[$index].length > 0'-->	
+							h5 Completed tasks
+							br
+							table(class='table table-striped')
+								thead
+								tbody(data-bind="template: { name: 'completeTaskTemplate', foreach: $parent.completedTasksMatrix()[$index()]}")
+				<!-- /ko -->
+	
 	script(type="text/javascript")
 		parameter = {"id": '#{listId}'}
 

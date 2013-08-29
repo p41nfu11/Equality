@@ -34,7 +34,7 @@ function ListViewModel() {
         console.log(parameter);
         self.listId(parameter.id);
 
-    	$.get('/api/user/', function(data) {
+    	$.get('/api/owners/' + parameter.id, function(data) {
     		data.forEach(function (e){
                 e.avatar = "https://graph.facebook.com/"+ e.fbUserName + "/picture";
                 e.points = ko.observable(e.points);

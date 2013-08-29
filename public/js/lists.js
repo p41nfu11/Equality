@@ -6,6 +6,15 @@ function ListsViewModel() {
     self.listToJoin = ko.observable();
     self.edit = ko.observable(false);
 
+    self.mailTo = ko.observable();
+    self.listToShare = ko.observable();
+    self.mailContent = ko.computed(function() {
+        if (self.listToShare())
+             return "Dear whatsyourname\n\nSomeone wants to equal out your relationship by sharing this eQal list with you. Show that bitch/asshole that you are the one that takes care of things by subscribing to this list: \n" + window.location.hostname +"/api/connectToList/" + self.listToShare()._id + "\n\nIf the link does nothing for you try loggin in to the EQALITY NETWORK!!! first... THEN clicking the link again.\n\nNow go show that bitch/asshole who is the real household hero!";
+        else
+            return "";
+    }, this);
+
     self.init = function(){
     	$.get('/api/lists/', function(data) {
     		data.forEach(function (e){
@@ -35,6 +44,17 @@ function ListsViewModel() {
                 self.lists.splice(index, 1);
         
         });
+    }
+
+    self.sendInvite = function(){
+        var share = {'listToShare': self.listToShare()._id, 'mailTo': self.mailTo(), 'mailContent': self.mailContent()};
+        $.post('/api/sendInvite/', share, function(response) {
+            self.listToShare(undefined);
+        });
+    }
+
+    self.share = function(clickedList){
+        self.listToShare(clickedList);
     }
 
     self.init();

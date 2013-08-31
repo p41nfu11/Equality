@@ -278,7 +278,7 @@ exports.updateTask = function(request, response){
 
 exports.completeTask = function(request, response){
 	var data = request.body;
-	var user = request.user;
+
 	process.nextTick(function(){
 		task.findOne({ _id:data._id },function(err,doc){
 		    if(err)
@@ -292,8 +292,10 @@ exports.completeTask = function(request, response){
 		    	console.log('found one. Completing task...');
 		    	
 		    	doc.completed = data.completed;
-	    		doc.completedBy = user._id;
+	    		doc.completedBy = data.completed? data.completedBy._id: '';
 	    		doc.completedDate = Date.now();
+
+
 
 		    	doc.save(function(err){
 					if(err){
@@ -304,7 +306,7 @@ exports.completeTask = function(request, response){
 					}
 
 					console.log("Updated task " + doc.title );
-					User.findOne({ _id:user._id },function(err,dbUser){
+					User.findOne({ _id:data.completedBy._id },function(err,dbUser){
 						if(err){
 							console.log('could not find user that completed task');
 							console.log(err);

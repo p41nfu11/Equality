@@ -24,6 +24,8 @@ var passport = require('passport'),
 
 var mandrill = require('node-mandrill')(config.dev.mandrill.apiKey);
 
+process.on('uncaughtException',function(err){  console.error(err);  console.log("Node NOT Exiting...");});
+
 console.log("EQUALITY SERVER");
 console.log("starting...");
 

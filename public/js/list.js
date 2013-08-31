@@ -34,15 +34,15 @@ function ListViewModel() {
         return perUser;
     }, this);
 
-
     //edit
     self.editTaskTitle = ko.observable('');
     self.editTaskPoints = ko.observable('');
 
+    //completing
+    self.completedBy = ko.observable('');
+
 
     self.init = function(){
-
-        
         self.listId(parameter.listId);
         self.userId(parameter.userId);
 
@@ -54,12 +54,6 @@ function ListViewModel() {
     		});
     	});
 
-        // $.get('/api/randomTasks/', function(data) {
-        //     data.forEach(function (e){
-        //         self.randomTasks.push(e);
-        //     });
-        // });    
-
         $.get('/api/recurringTasks/' + parameter.listId, function(data) {
             data.forEach(function (t){
                 self.recurringTasks.push(t);
@@ -69,6 +63,7 @@ function ListViewModel() {
         $.get('/api/tasks/' + parameter.listId, function(data) {
             data.forEach(function (e){
                 e.editActive = ko.observable(false);
+                e.completingActive = ko.observable(false);
                 if (!e.completed)
                     e.completed = false;
 
@@ -118,6 +113,7 @@ function ListViewModel() {
         var newTask = {title: self.title, createdDate: new Date(), completed: false, dueDate: nextWeek, points: self.points};
         $.post('/api/task', {task:newTask, listId: parameter.listId}, function(data) {
             data.editActive = ko.observable(false);    
+            data.completingActive = ko.observable(false);   
             self.addTaskToList(data);
             self.title('');
             self.points('');
@@ -127,7 +123,6 @@ function ListViewModel() {
     self.addRecurringTaskWasClicked = function(){
         var newRecurringTask = {title: self.recurringTaskTitle, createdDate: new Date(), interval: self.recurringTaskInterval, points: self.recurringTaskPoints};
         $.post('/api/recurringTask/', {recurringTask:newRecurringTask, listId: parameter.listId}, function(data) {
-            //data.editActive = ko.observable(false);    
             self.recurringTasks.push(data);
             self.recurringTaskTitle('');
             self.recurringTaskPoints('');
@@ -141,7 +136,9 @@ function ListViewModel() {
         
         var newTask = {title: task.title, createdDate: new Date(), completed: false, dueDate: nextWeek, points: task.points};
         $.post('/api/task', {task:newTask, listId: parameter.listId}, function(data) {
-            data.editActive = ko.observable(false);    
+            data.editActive = ko.observable(false);   
+            data.completingActive = ko.observable(false);   
+            
             self.addTaskToList(data);
             self.title('');
             self.points('');
@@ -162,29 +159,37 @@ function ListViewModel() {
     }
 
     self.checkboxClicked = function(data){
-        $.post('/api/completeTask/', data, function(completedTask) {
-            self.removeTaskFromList(data);
-            completedTask.editActive = ko.observable(false);
-            self.addTaskToList(completedTask);
-            var index = -1;
-            for (var i = 0; i < self.users().length; i ++)
-            {
-                if (self.users()[i]._id === completedTask.completedBy){
-                    index = i;
-                    break;
-                }
-            }
-            if (index > -1){
-                var updatingUser = self.users()[index]; 
-                if (completedTask.completed)
-                    updatingUser.points(updatingUser.points() + completedTask.points);
-                else
-                    updatingUser.points(updatingUser.points() - completedTask.points);
-            }
-        }); 
+        data.completingActive(data.completed);
         //returns true so as to notify the checkbox to mark/unmark itself (can not be done in callback)
         return true;
     };
+
+    self.completedTaskCheckboxClicked = function(task, user){
+        task.completedBy = user;
+        $.post('/api/completeTask/', task, function(completedTask) {
+            self.removeTaskFromList(task);
+            user.points(user.points() + completedTask.points);
+
+            completedTask.editActive = ko.observable(false);    
+            completedTask.completingActive = ko.observable(false);   
+            self.addTaskToList(completedTask);
+
+
+        }); 
+        //returns true so as to notify the checkbox to mark/unmark itself (can not be done in callback)
+        return true;
+    };    
+
+    self.completeTaskWithUser = function(task, user){
+        task.completedBy = user;
+        $.post('/api/completeTask/', task, function(completedTask) {
+            self.removeTaskFromList(task);
+            user.points(user.points() + completedTask.points);
+            self.addTaskToList(completedTask);
+
+            task.completingActive(false);
+        }); 
+    }
 
     self.editButtonWasClicked = function(task){
         if (!task.editActive()){

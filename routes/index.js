@@ -14,8 +14,8 @@ exports.lists = function(req, res){
 exports.showList = function(req, res) {
     var reqList = req.params.id;
 
-    console.log(reqList);
     res.render('list', {
-        listId: reqList
+        listId: reqList,
+        userId: req.user._id
     })
 }

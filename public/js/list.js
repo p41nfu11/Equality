@@ -3,6 +3,7 @@ function ListViewModel() {
     self = this;
 
     self.listId = ko.observable();
+    self.userId = ko.observable();
     //self.owners = ko.observableArray();
     self.users = ko.observableArray();
     self.tasks = ko.observableArray();
@@ -39,11 +40,10 @@ function ListViewModel() {
 
 
     self.init = function(){
+        self.listId(parameter.listId);
+        self.userId(parameter.userId);
 
-        console.log(parameter);
-        self.listId(parameter.id);
-
-    	$.get('/api/owners/' + parameter.id, function(data) {
+    	$.get('/api/owners/' + parameter.listId, function(data) {
     		data.forEach(function (e){
                 e.avatar = "https://graph.facebook.com/"+ e.fbUserName + "/picture";
                 e.points = ko.observable(e.points);
@@ -57,13 +57,13 @@ function ListViewModel() {
         //     });
         // });    
 
-        $.get('/api/recurringTasks/' + parameter.id, function(data) {
+        $.get('/api/recurringTasks/' + parameter.listId, function(data) {
             data.forEach(function (t){
                 self.recurringTasks.push(t);
             });
         });       
 
-        $.get('/api/tasks/' + parameter.id, function(data) {
+        $.get('/api/tasks/' + parameter.listId, function(data) {
             data.forEach(function (e){
                 e.editActive = ko.observable(false);
                 if (!e.completed)
@@ -113,7 +113,7 @@ function ListViewModel() {
         var nextWeek = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 7);
         
         var newTask = {title: self.title, createdDate: new Date(), completed: false, dueDate: nextWeek, points: self.points};
-        $.post('/api/task', {task:newTask, listId: parameter.id}, function(data) {
+        $.post('/api/task', {task:newTask, listId: parameter.listId}, function(data) {
             data.editActive = ko.observable(false);    
             self.addTaskToList(data);
             self.title('');
@@ -123,7 +123,7 @@ function ListViewModel() {
 
     self.addRecurringTaskWasClicked = function(){
         var newRecurringTask = {title: self.recurringTaskTitle, createdDate: new Date(), interval: self.recurringTaskInterval, points: self.recurringTaskPoints};
-        $.post('/api/recurringTask/', {recurringTask:newRecurringTask, listId: parameter.id}, function(data) {
+        $.post('/api/recurringTask/', {recurringTask:newRecurringTask, listId: parameter.listId}, function(data) {
             //data.editActive = ko.observable(false);    
             self.recurringTasks.push(data);
             self.recurringTaskTitle('');
@@ -137,7 +137,7 @@ function ListViewModel() {
         var nextWeek = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 7);
         
         var newTask = {title: task.title, createdDate: new Date(), completed: false, dueDate: nextWeek, points: task.points};
-        $.post('/api/task', {task:newTask, listId: parameter.id}, function(data) {
+        $.post('/api/task', {task:newTask, listId: parameter.listId}, function(data) {
             data.editActive = ko.observable(false);    
             self.addTaskToList(data);
             self.title('');

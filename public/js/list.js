@@ -6,10 +6,19 @@ function ListViewModel() {
     //self.owners = ko.observableArray();
     self.users = ko.observableArray();
     self.tasks = ko.observableArray();
+    self.randomTasks = ko.observableArray();
+    self.recurringTasks = ko.observableArray();
     self.completedTasks = ko.observableArray();
     self.edit = ko.observable(false);
     self.title = ko.observable('');
-    self.points = ko.observable('');
+    self.points = ko.observable();
+
+    self.addTaskViewActive = ko.observable(true);
+    self.addRecurringTaskViewActive = ko.observable(false);
+
+    self.recurringTaskTitle = ko.observable('');
+    self.recurringTaskPoints = ko.observable();
+    self.recurringTaskInterval = ko.observable();
 
     self.completedTasksMatrix = ko.computed(function() {
         var perUser = [];
@@ -41,6 +50,18 @@ function ListViewModel() {
     			self.users.push(e);	
     		});
     	});
+
+        // $.get('/api/randomTasks/', function(data) {
+        //     data.forEach(function (e){
+        //         self.randomTasks.push(e);
+        //     });
+        // });    
+
+        $.get('/api/recurringTasks/' + parameter.id, function(data) {
+            data.forEach(function (t){
+                self.recurringTasks.push(t);
+            });
+        });       
 
         $.get('/api/tasks/' + parameter.id, function(data) {
             data.forEach(function (e){
@@ -89,7 +110,7 @@ function ListViewModel() {
         }
 
         var today = new Date();
-        var nextWeek = new Date(Date.parse(new Date(today.getFullYear(), today.getMonth(), today.getDate() + 7)));
+        var nextWeek = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 7);
         
         var newTask = {title: self.title, createdDate: new Date(), completed: false, dueDate: nextWeek, points: self.points};
         $.post('/api/task', {task:newTask, listId: parameter.id}, function(data) {
@@ -98,14 +119,36 @@ function ListViewModel() {
             self.title('');
             self.points('');
         }); 
-        
-
     };
+
+    self.addRecurringTaskWasClicked = function(){
+        var newRecurringTask = {title: self.recurringTaskTitle, createdDate: new Date(), interval: self.recurringTaskInterval, points: self.recurringTaskPoints};
+        $.post('/api/recurringTask/', {recurringTask:newRecurringTask, listId: parameter.id}, function(data) {
+            //data.editActive = ko.observable(false);    
+            self.recurringTasks.push(data);
+            self.recurringTaskTitle('');
+            self.recurringTaskPoints('');
+            self.recurringTaskInterval('');
+        }); 
+    };
+
+    self.reAddTask = function(task){
+        var today = new Date();
+        var nextWeek = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 7);
+        
+        var newTask = {title: task.title, createdDate: new Date(), completed: false, dueDate: nextWeek, points: task.points};
+        $.post('/api/task', {task:newTask, listId: parameter.id}, function(data) {
+            data.editActive = ko.observable(false);    
+            self.addTaskToList(data);
+            self.title('');
+            self.points('');
+        }); 
+    }
 
     self.snoozeTaskWasClicked = function(task)
     {   
         var today = new Date();
-        var threeDays = new Date(Date.parse(new Date(today.getFullYear(), today.getMonth(), today.getDate() + 3)));
+        var threeDays = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 3);
 
         task.dueDate = threeDays;
 
@@ -176,6 +219,14 @@ function ListViewModel() {
     {
         $.post('/api/removeTask/', task, function() {
             self.removeTaskFromList(task);
+        });
+    }
+
+    self.removeRecurringTask = function(task)
+    {
+        $.post('/api/removeRecurringTask/', task, function() {
+            var index = self.recurringTasks.indexOf(task);
+            self.recurringTasks.splice(index, 1);
         });
     }
 

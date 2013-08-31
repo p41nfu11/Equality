@@ -7,6 +7,7 @@ var taskSchema = new mongoose.Schema({
 	text: String,
 	createdDate: Date,
 	dueDate: Date,
+	completedDate: Date,
 	completed: Boolean,
 	completedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
 	points: Number

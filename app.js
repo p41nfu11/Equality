@@ -6,6 +6,7 @@
 var express = require('express')
   , routes = require('./routes')
   , api = require('./routes/api')
+  , admin = require('./routes/admin')
   , userApi = require('./routes/userApi')
   , http = require('http')
   , path = require('path');
@@ -104,6 +105,9 @@ app.get('/', routes.index);
 
 app.get('/lists', ensureAuthenticated, routes.lists);
 
+app.get('/admin', ensureAdmin, admin.adminIndex);
+app.get('/admin/lists/', ensureAdmin, admin.lists);
+
 app.post('/api/list/', ensureAuthenticated, api.addList);
 app.post('/api/listAddOwner/', ensureAuthenticated, api.listAddOwner);
 app.get('/api/connectToList/:id', ensureAuthenticated, api.listConnectToUser);
@@ -125,6 +129,13 @@ app.get('/api/task/', ensureAuthenticated, api.tasks);
 app.post('/api/task', ensureAuthenticated, api.addTask);
 app.post('/api/updateTask/', ensureAuthenticated, api.updateTask);
 app.post('/api/completeTask/', ensureAuthenticated, api.completeTask);
+
+app.post('/api/recurringTask/', ensureAuthenticated, api.createRecurringTask);
+app.post('/api/removeRecurringTask/', ensureAuthenticated, api.removeRecurringTasks);
+app.get('/api/recurringTasks/:id', ensureAuthenticated, api.getRecurringTasksByList);
+
+
+app.get('/api/randomTasks/', ensureAuthenticated, api.randomTasks);
 
 app.post('/api/sendInvite/', ensureAuthenticated, function(request, response) {
 	console.log(request.body);
@@ -171,8 +182,27 @@ http.createServer(app).listen(app.get('port'), function(){
   console.log('Equality listening on port ' + app.get('port'));
 });
 
+function setupTimeout(){
+	setTimeout(function(){
+		console.log("running recurring tasks");
+		api.triggerRecurring();
+		setupTimeout();
+	}, 86400000); 
+};
+setupTimeout();
+
 function ensureAuthenticated(req, res, next) {
     if (req.isAuthenticated()) { return next(); }
     res.redirect('/');
-}
+};
+
+function ensureAdmin(req, res, next) {
+    if (req.isAuthenticated()) { 
+    	console.log(req.user.email);
+    	if (req.user.email === config.dev.adminMail){
+    		return next(); 	
+    	}
+    }
+    res.redirect('/');
+};
 

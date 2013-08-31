@@ -37,9 +37,12 @@ function ListViewModel() {
 
     //edit
     self.editTaskTitle = ko.observable('');
+    self.editTaskPoints = ko.observable('');
 
 
     self.init = function(){
+
+        
         self.listId(parameter.listId);
         self.userId(parameter.userId);
 
@@ -187,22 +190,25 @@ function ListViewModel() {
         if (!task.editActive()){
             task.editActive(true);
             self.editTaskTitle(task.title);
+            self.editTaskPoints(task.points);
         }
         else{
-            self.editActive(false);
+            task.editActive(false);
             self.editTaskTitle('');
+            self.editTaskPoints('');
         }
     };
 
     self.editTask = function(task){
-        //task.title = self.editTaskTitle();
-
+        task.title = self.editTaskTitle();
+        task.points = self.editTaskPoints();
         $.post('/api/updateTask/', task, function() {
-            //self.removeTaskFromList(task);
-            //self.addTaskToList(task);
+            // self.removeTaskFromList(task);
+            // self.addTaskToList(task);
         }); 
 
-        //self.editTaskTitle('');
+        self.editTaskTitle('');
+        self.editTaskPoints('');
         task.editActive(false);
     }
 

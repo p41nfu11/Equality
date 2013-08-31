@@ -259,6 +259,7 @@ exports.updateTask = function(request, response){
 		    	doc.dueDate = data.dueDate;
 		    	doc.title = data.title;
 		    	doc.text = data.text;
+		    	doc.points = data.points;
 
 		    	doc.save(function(err){
 					if(err){

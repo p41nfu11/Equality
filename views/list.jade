@@ -3,20 +3,16 @@ extends layout
 block content
 	div(class='container')
 		script(type="text/html", id="taskTemplate")
+			<!-- ko ifnot: editActive -->
 			tr
+				
 				td
 					input(type='checkbox',data-bind='checked:completed,click:$parent.checkboxClicked')
 				td
-					<!-- ko ifnot: editActive -->
+					
 					span(class="badge badge-important", data-bind="if: $parent.isDue($data)") due
 					&nbsp;
 					span(data-bind="text: title")
-					<!-- /ko -->
-					<!-- ko if: editActive -->
-					form(class='form')
-						input(ID='title', data-bind='value: title',placeholder="edit title", class='input-medium')
-						button(data-bind='click:function(){$parent.editTask($data)}', class='btn') Edit
-					<!-- /ko -->
 				td
 					span(data-bind="text: points")
 					span(class="glyphicon glyphicon-star")
@@ -28,7 +24,31 @@ block content
 							span(class="glyphicon glyphicon-pencil")
 						button(class='btn btn-default btn-xs',type='button', data-bind='click:$parent.removeTask')
 							span(class="glyphicon glyphicon-remove")
-					
+			<!-- /ko -->
+			<!-- ko if: $data.editActive -->
+			tr
+				td(colspan="4")
+					div
+						div(class="form-group")
+							input(data-bind='value: $root.editTaskTitle',placeholder="edit title", class='form-control')
+						div(class="form-group")
+								div(class="input-group")
+									div(class="btn-group btn-group-sm")
+										span(class="btn", data-bind="css:{'btn-default': $root.editTaskPoints() !== 1,  'btn-success': $root.editTaskPoints() === 1},  click: function(){ $root.editTaskPoints( 1);}") 1
+										span(class="btn", data-bind="css:{'btn-default': $root.editTaskPoints() !== 2,  'btn-success': $root.editTaskPoints() === 2},  click: function(){ $root.editTaskPoints(  2);}") 2
+										span(class="btn", data-bind="css:{'btn-default': $root.editTaskPoints() !== 3,  'btn-success': $root.editTaskPoints() === 3},  click: function(){ $root.editTaskPoints(  3);}") 3
+										span(class="btn", data-bind="css:{'btn-default': $root.editTaskPoints() !== 5,  'btn-success': $root.editTaskPoints() === 5},  click: function(){ $root.editTaskPoints(  5);}") 5
+										span(class="btn", data-bind="css:{'btn-default': $root.editTaskPoints() !== 8,  'btn-success': $root.editTaskPoints() === 8},  click: function(){ $root.editTaskPoints(  8);}") 8
+										span(class="btn", data-bind="css:{'btn-default': $root.editTaskPoints() !== 16, 'btn-success': $root.editTaskPoints() === 13}, click: function(){ $root.editTaskPoints( 13);}") 13
+										span(class="btn", data-bind="css:{'btn-default': $root.editTaskPoints() !== 32, 'btn-success': $root.editTaskPoints() === 21}, click: function(){ $root.editTaskPoints( 21);}") 21
+										span(class="btn", data-bind="css:{'btn-default': $root.editTaskPoints() !== 64, 'btn-success': $root.editTaskPoints() === 34}, click: function(){ $root.editTaskPoints( 34);}") 34
+										span(class="btn btn-warning glyphicon glyphicon-star", disabled="disabled")
+						div(class="form-group")
+							button(data-bind="click: function(){$root.editTask($data);}", class='btn btn-default') Done
+							&nbsp;
+							button(data-bind="click: function(){$data.editActive(false);}", class='btn btn-default') Cancel
+
+			<!-- /ko -->	
 
 					
 		script(type="text/html", id="completeTaskTemplate")
@@ -112,7 +132,7 @@ block content
 						<!-- /ko -->
 					<!-- ko if: recurringTasks().length > 0 -->
 					div(class="well")
-						h4 Recurring tasks <small> will be created automatically </small>
+						h4 Recurring tasks <small> will create tasks for you</small>
 						table(class="table table-striped table-condensed", style="margin-bottom:0px;")
 							thead
 							tbody(data-bind="foreach: recurringTasks")

@@ -208,8 +208,8 @@ function ListViewModel() {
         task.title = self.editTaskTitle();
         task.points = self.editTaskPoints();
         $.post('/api/updateTask/', task, function() {
-            // self.removeTaskFromList(task);
-            // self.addTaskToList(task);
+            self.removeTaskFromList(task);
+            self.addTaskToList(task);
         }); 
 
         self.editTaskTitle('');

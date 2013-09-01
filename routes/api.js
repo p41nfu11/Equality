@@ -1,44 +1,49 @@
 var list = require('../models/list');
 var task = require('../models/task');
 var User = require('../models/user');
+var LogEntry = require('../models/logentry');
 var RecurringTask = require('../models/recurringtask');
+var Log = require('../models/log.js');
 
 exports.tasks = function(req, res){
-	console.log(req.body);
+	Log.createLogEntry(req.user.name + " fetching tasks", "debug");
   	process.nextTick(function(){
 		var query = task.find({'fbId': req.user.fbId}).populate('completedBy');;
 		query.exec(function(err, tasks){
+			if(err){
+				Log.createLogEntry("tasks: " + err, "error");
+				res.send(500);
+			}
 			res.send(tasks);
 		});
 	});
 };
 
 exports.lists = function(req, res){
+	Log.createLogEntry(req.user.name + " fetching lists", "debug");
   	process.nextTick(function(){
 		var query = list.find({ 'owners': { $in: [ req.user ] } });
 		query.exec(function(err, lists){
 			if(err)
 			{
-				console.log('err trying to find lists');	
+				Log.createLogEntry("lists: " + err, "error");
 				res.send(404);
 			}
-			console.log(lists);
 			res.send(lists);
 		});
 	});
 };
 
 exports.randomTasks = function(req, res){
+	Log.createLogEntry(req.user.name + " fetching random tasks", "debug");
 	process.nextTick(function(){
 		var query = task.find().sort({createdDate: -1}).limit(3);
 		query.exec(function(err, tasks){
 			if(err)
 			{
-				console.log('err trying to find tasks');	
-				console.log(err);
+				Log.createLogEntry("randomTasks: " + err, "error");
 				res.send(404);
 			}
-			console.log(tasks);
  			res.send(tasks);
 		});		
 	});
@@ -46,16 +51,15 @@ exports.randomTasks = function(req, res){
 
 exports.owners = function(req, res){
 	var listId = req.params.id;
+	Log.createLogEntry(req.user.name + " fetching owners for list " + listId, "debug");
   	process.nextTick(function(){
 		var query = list.findOne({ '_id': listId }).populate('owners');
 		query.exec(function(err, list){
 			if(err)
 			{
-				console.log('err trying to find list');	
-				console.log(err);
+				Log.createLogEntry("owners: " + err, "error");
 				res.send(404);
 			}
-			console.log(list);
 			res.send(list.owners);
 		});
 	});
@@ -63,29 +67,28 @@ exports.owners = function(req, res){
 
 exports.list = function(req, res){
 	var listId = req.params.id;
+	Log.createLogEntry(req.user.name + " fetching list " + listId, "debug");
   	process.nextTick(function(){
 		var query = list.findOne({ '_id': listId });
 		query.exec(function(err, list){
 			if(err)
 			{
-				console.log('err trying to find list');	
-				console.log(err);
+				Log.createLogEntry("list: " + err, "error");
 				res.send(404);
 			}
-			console.log(list);
 			res.send(list);
 		});
 	});
 };
 
 exports.tasksByList = function(req, res){
+	Log.createLogEntry(req.user.name + " fetching tasks by list " + req.params.id, "debug");
   	process.nextTick(function(){
 		var query = list.findOne({ '_id': req.params.id }).populate('tasks');
 		query.exec(function(err, list){
 			if(err)
 			{
-				console.log('err trying to find list');	
-				console.log(err);
+				Log.createLogEntry("tasksByList: " + err, "error");
 				res.send(404);
 			}
 			res.send(list.tasks);
@@ -94,8 +97,10 @@ exports.tasksByList = function(req, res){
 };
 
 exports.addList = function (request, response) {
+
     var listData = request.body;
-    console.log(listData);
+    Log.createLogEntry(request.user.name + " creating list " + listData.title, "debug");
+
     var newList = new list();
     newList.title = listData.title || 'Default title';
     newList.text = listData.description || 'Default description';
@@ -105,12 +110,11 @@ exports.addList = function (request, response) {
 	process.nextTick(function(){
 	    newList.save(function(err, savedList){
 			if(err){
-				console.log('could not save list');
-				console.log(err);
+				Log.createLogEntry("addList: " + err, "error");
 				response.send(500, err);
 				return;
 			}
-			console.log("New task " + savedList.title + " was created");
+			Log.createLogEntry("New task " + savedList.title + " was created", "debug");
 			response.send(200, savedList);
 		});	
 	});
@@ -119,7 +123,7 @@ exports.addList = function (request, response) {
 exports.addTask = function (request, response) {
     var taskData = request.body.task;
     var listId = request.body.listId;
-    console.log(taskData);
+    Log.createLogEntry(request.user.name + " creating task " + taskData.title, "debug");
 
     var newTask = new task();
     newTask.title = taskData.title || 'Default title';
@@ -132,29 +136,22 @@ exports.addTask = function (request, response) {
 	process.nextTick(function(){
 	    newTask.save(function(err){
 			if(err){
-				console.log('could not save task');
-				console.log(err);
+				Log.createLogEntry("addTask: " + err, "error");
 				response.send(500, err);
 				return;
 			}
-			console.log("New task " + newTask.title + " was created");
-			
 		});	
-
-    
 		var query = list.findOne({ '_id': listId });
 		query.exec(function(err, list){
 			if(err)
 			{
-				console.log('err trying to find list');	
-				console.log(err);
+				Log.createLogEntry("addTask: " + err, "error");
 				response.send(404);
 			}
 			list.tasks.push(newTask);
 			list.save(function(err){
 				if(err){
-					console.log('could not save list');
-					console.log(err);
+					Log.createLogEntry("addTask: " + err, "error");
 					response.send(500, err);
 					return;
 				}
@@ -170,29 +167,24 @@ exports.listAddOwner = function (request, response) {
 	var userId = request.user._id; 
 	var listId = request.body.listId;
 	process.nextTick(function(){
-		console.log('user = ' + userId);
-		console.log(listId);
 		var query = list.findOne({ '_id': listId });
 		query.exec(function(err, list){
 			if(err)
 			{
-				console.log('err trying to find list');	
-				console.log(err);
+				Log.createLogEntry("listAddOwner: " + err, "error");
 				response.send(404);
 				return;
 			}
 			if(list.owners.indexOf(userId) > -1)
 			{
-				console.log('user: ' + userId + ' is already added to this list ' + list.title);	
-				console.log(err);
+				Log.createLogEntry('user: ' + userId + ' is already added to this list ' + list.title);	
 				response.send(200);	
 				return;
 			}	
 			list.owners.push(userId);
 			list.save(function(err){
 				if(err){
-					console.log('error while trying to save list');
-					console.log(err);
+					Log.createLogEntry("listAddOwner: " + err, "error");
 					response.send(500);	
 					return;
 				}
@@ -207,29 +199,26 @@ exports.listConnectToUser = function (request, response) {
 	var userId = request.user._id; 
 	var listId = request.params.id;
 	process.nextTick(function(){
-		console.log("connecting user " + userId + " to list " + listId);
+		Log.createLogEntry("connecting user " + userId + " to list " + listId, "debug");
 
 		var query = list.findOne({ '_id': listId });
 		query.exec(function(err, list){
 			if(err)
 			{
-				console.log('err trying to find list');	
-				console.log(err);
+				Log.createLogEntry("listConnectToUser: " + err, "error");
 				response.send(404);
 				return;
 			}
 			if(list.owners.indexOf(userId) > -1)
 			{
-				console.log('user: ' + userId + ' is already added to this list ' + list.title);	
-				console.log(err);
+				Log.createLogEntry('user: ' + userId + ' is already added to this list ' + list.title, "debug");	
 				response.send(200);	
 				return;
 			}	
 			list.owners.push(userId);
 			list.save(function(err){
 				if(err){
-					console.log('could not save list');
-					console.log(err);
+					Log.createLogEntry("listConnectToUser: " + err, "error");
 					response.send(500, err);
 					return;
 				}
@@ -243,17 +232,18 @@ exports.listConnectToUser = function (request, response) {
 exports.updateTask = function(request, response){
 	var data = request.body;
 	var user = request.user;
+
+	Log.createLogEntry(request.user.name + " updating task " + data.title, "debug");
+
 	process.nextTick(function(){
 		task.findOne({ _id:data._id },function(err,doc){
 		    if(err)
 		    {
-		    	console.log('could not find task with id ' + data._id);
-		    	console.log(err);
+		    	Log.createLogEntry("updateTask: " + err, "error");
 		    	response.send(404);
 		    	return;
 		    }
 		    else{
-		    	console.log('found one. Updating...');
 		    	
 		    	doc.completed = data.completed;
 		    	doc.dueDate = data.dueDate;
@@ -263,12 +253,10 @@ exports.updateTask = function(request, response){
 
 		    	doc.save(function(err){
 					if(err){
-						console.log('could not save updated task');
-						console.log(err);
+						Log.createLogEntry("updateTask: " + err, "error");
 						response.send(500, err);
 						return;
 					}
-					console.log("Updated task " + doc.title );
 					response.send(200, doc);
 				});	
 		    }
@@ -278,13 +266,13 @@ exports.updateTask = function(request, response){
 
 exports.completeTask = function(request, response){
 	var data = request.body;
+	Log.createLogEntry(request.user.name + " completing task " + data.title, "debug");
 
 	process.nextTick(function(){
 		task.findOne({ _id:data._id },function(err,doc){
 		    if(err)
 		    {
-		    	console.log('could not find task with id ' + data._id);
-		    	console.log(err);
+		    	Log.createLogEntry("completeTask: " + err, "error");
 		    	response.send(404);
 		    	return;
 		    }
@@ -299,8 +287,7 @@ exports.completeTask = function(request, response){
 
 		    	doc.save(function(err){
 					if(err){
-						console.log('could not save complete task');
-						console.log(err);
+						Log.createLogEntry("completeTask: " + err, "error");
 						response.send(500, err);
 						return;
 					}
@@ -308,8 +295,7 @@ exports.completeTask = function(request, response){
 					console.log("Updated task " + doc.title );
 					User.findOne({ _id:data.completedBy._id },function(err,dbUser){
 						if(err){
-							console.log('could not find user that completed task');
-							console.log(err);
+							Log.createLogEntry("completeTask: " + err, "error");
 							response.send(404, err);
 							return;
 						}	
@@ -319,8 +305,7 @@ exports.completeTask = function(request, response){
 							dbUser.points -= doc.points;
 						dbUser.save(function(err){
 							if(err){
-								console.log('could not save completing user');
-								console.log(err);
+								Log.createLogEntry("completeTask: " + err, "error");
 								response.send(500, err);
 								return;
 							}	
@@ -334,12 +319,12 @@ exports.completeTask = function(request, response){
 }
 
 exports.removeList = function(request, response){
+	Log.createLogEntry(request.user.name + " removing list", "debug");
 	process.nextTick(function(){		
 		list.find({ _id:request.body._id },function(err,docs){
 		    if(err)
 		    {
-		    	console.log('could not find list');
-				console.log(err);
+		    	Log.createLogEntry("removeList: " + err, "error");
 				response.send(404, err);
 		    }
 		    else
@@ -355,12 +340,12 @@ exports.removeList = function(request, response){
 }
 
 exports.removeTask = function (request, response) {
+	Log.createLogEntry(request.user.name + " removing task", "debug");
 	process.nextTick(function(){
 		task.find({ _id:request.body._id },function(err,docs){
 		    if(err)
 		    {
-		    	console.log('could not find task');
-				console.log(err);
+		    	Log.createLogEntry("removeTask: " + err, "error");
 				response.send(404, err);
 		    }
 		    else
@@ -382,8 +367,7 @@ exports.getRecurringTasksByList = function(req, res){
 		query.exec(function(err, tasks){
 			if(err)
 			{
-				console.log('err trying to find recurring task');	
-				console.log(err);
+				Log.createLogEntry("getRecurringTasksByList: " + err, "error");
 				res.send(404);
 			}
 			else{
@@ -398,8 +382,7 @@ exports.removeRecurringTasks = function(req, res){
 		RecurringTask.find({ _id:req.body._id },function(err,docs){
 		    if(err)
 		    {
-		    	console.log('could not find recurring task');
-				console.log(err);
+		    	Log.createLogEntry("removeRecurringTasks: " + err, "error");
 				res.send(404, err);
 		    }
 		    else
@@ -415,6 +398,7 @@ exports.removeRecurringTasks = function(req, res){
 }
 
 exports.createRecurringTask = function(req, res){
+	Log.createLogEntry(req.user.name + " creating recurring task", "debug");
 	var recurringTaskData = req.body.recurringTask;
     var listId = req.body.listId;
 
@@ -437,8 +421,7 @@ exports.createRecurringTask = function(req, res){
 
 	    newRecurringTask.save(function(err){
 			if(err){
-				console.log('could not save recurring task');
-				console.log(err);
+				Log.createLogEntry("createRecurringTask: " + err, "error");
 				res.send(500, err);
 				return;
 			}
@@ -449,13 +432,13 @@ exports.createRecurringTask = function(req, res){
 }
 
 exports.triggerRecurring = function(){
+	Log.createLogEntry("triggering recurring tasks", "debug");
 	process.nextTick(function(){
 		var query = RecurringTask.find({});
 		query.exec(function(err, recurringTasks){
 			if(err)
 			{
-				console.log('err trying to find recurring tasks');	
-				console.log(err);
+				Log.createLogEntry("triggerRecurring: " + err, "error");
 			}
 			else{
 				recurringTasks.forEach(function(recurringTask){
@@ -480,9 +463,7 @@ exports.triggerRecurring = function(){
 
 						newTask.save(function(err){
 							if(err){
-								console.log('could not save task');
-								console.log(err);
-								
+								Log.createLogEntry("triggerRecurring: " + err, "error");
 								return;
 							}
 							console.log("New task " + newTask.title + " was created");
@@ -493,16 +474,13 @@ exports.triggerRecurring = function(){
 						query.exec(function(err, list){
 							if(err)
 							{
-								console.log('err trying to find list');	
-								console.log(err);
+								Log.createLogEntry("triggerRecurring: " + err, "error");
 								
 							}
 							list.tasks.push(newTask);
 							list.save(function(err){
 								if(err){
-									console.log('could not save list');
-									console.log(err);
-									
+									Log.createLogEntry("triggerRecurring: " + err, "error");
 									return;
 								}
 								console.log("list was saved");

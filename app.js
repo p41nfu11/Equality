@@ -18,16 +18,18 @@ var mongoose = require('mongoose');
 var config = require('./config');
 
 var user = require('./models/user');
+var Log = require('./models/log.js');
 
 var passport = require('passport'),
 	facebookStrategy = require('passport-facebook').Strategy;
 
 var mandrill = require('node-mandrill')(config.dev.mandrill.apiKey);
 
-process.on('uncaughtException',function(err){  console.error(err);  console.log("Node NOT Exiting...");});
+process.on('uncaughtException',function(err){  
+	Log.createLogEntry("uncaught exception: " + err, "error");
+});
 
-console.log("EQUALITY SERVER");
-console.log("starting...");
+Log.createLogEntry("STARTING EQUALITY SERVER", "debug");
 
 //setting for passport
 passport.serializeUser(function(user,done)
@@ -55,7 +57,7 @@ passport.use(new facebookStrategy({
 				
 				if(oldUser)
 				{
-					console.log("found old user: " + oldUser.name + ": Logged in!");
+					Log.createLogEntry("found old user: " + oldUser.name + ": Logged in!", "debug");
 					done(null, oldUser);
 				}
 				else{
@@ -70,8 +72,7 @@ passport.use(new facebookStrategy({
 						if(err){
 							throw err;
 						}
-						console.log("New user " + newUser.name + " was created");
-						console.log(profile.username);
+						Log.createLogEntry("New user " + newUser.name + " was created", "debug");
 						done(null, newUser);
 					});
 				}
@@ -109,6 +110,8 @@ app.get('/lists', ensureAuthenticated, routes.lists);
 
 app.get('/admin', ensureAdmin, admin.adminIndex);
 app.get('/admin/lists/', ensureAdmin, admin.lists);
+app.get('/admin/log/', ensureAdmin, admin.log);
+
 
 app.post('/api/list/', ensureAuthenticated, api.addList);
 app.post('/api/listAddOwner/', ensureAuthenticated, api.listAddOwner);
@@ -151,10 +154,13 @@ app.post('/api/sendInvite/', ensureAuthenticated, function(request, response) {
 }, function(error, response)
 {
     //uh oh, there was an error
-    if (error) console.log( JSON.stringify(error) );
-
+    if (error) {
+    	Log.createLogEntry(JSON.stringify(error), "error");
+    }
     //everything's good, lets see what mandrill said
-    else console.log(response);
+    else {
+    	Log.createLogEntry("sent mail: " + response, "debug");
+    } 
 });
 	response.send(200);
 });
@@ -186,7 +192,7 @@ http.createServer(app).listen(app.get('port'), function(){
 
 function setupTimeout(){
 	setTimeout(function(){
-		console.log("running recurring tasks");
+		Log.createLogEntry("running recurring tasks", "debug");
 		api.triggerRecurring();
 		setupTimeout();
 	}, 86400000); 
@@ -200,7 +206,6 @@ function ensureAuthenticated(req, res, next) {
 
 function ensureAdmin(req, res, next) {
     if (req.isAuthenticated()) { 
-    	console.log(req.user.email);
     	if (req.user.email === config.dev.adminMail){
     		return next(); 	
     	}

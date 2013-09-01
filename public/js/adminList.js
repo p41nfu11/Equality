@@ -2,12 +2,19 @@ function AdminViewModel() {
     self = this;
 
     self.lists = ko.observableArray();
+    self.logEntries = ko.observableArray();
 
     $.get('/admin/lists/', function(listsData) {
         listsData.forEach(function (list){
             self.lists.push(list);
         });
     });   
+
+    $.get('/admin/log/', function(log) {
+        log.forEach(function (entry){
+            self.logEntries.push(entry);
+        });
+    }); 
 };
 
 ko.applyBindings(new AdminViewModel());

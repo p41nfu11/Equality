@@ -4,7 +4,6 @@ function ListViewModel() {
 
     self.listId = ko.observable();
     self.userId = ko.observable();
-    //self.owners = ko.observableArray();
     self.users = ko.observableArray();
     self.tasks = ko.observableArray();
     self.randomTasks = ko.observableArray();
@@ -37,10 +36,6 @@ function ListViewModel() {
     //edit
     self.editTaskTitle = ko.observable('');
     self.editTaskPoints = ko.observable('');
-
-    //completing
-    self.completedBy = ko.observable('');
-
 
     self.init = function(){
         self.listId(parameter.listId);

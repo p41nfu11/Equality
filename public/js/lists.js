@@ -10,7 +10,7 @@ function ListsViewModel() {
     self.listToShare = ko.observable();
     self.mailContent = ko.computed(function() {
         if (self.listToShare())
-             return "Dear whatsyourname\n\nSomeone wants to equal out your relationship by sharing this eQal list with you. Show that bitch/asshole that you are the one that takes care of things by subscribing to this list: \n" + window.location.hostname +"/api/connectToList/" + self.listToShare()._id + "\n\nIf the link does nothing for you try loggin in to the EQALITY NETWORK!!! first... THEN clicking the link again.\n\nNow go show that bitch/asshole who is the real household hero!";
+             return "Dear whatsyourname\n\nSomeone wants to equal out your relationship by sharing this equality list with you. Show that someone that you are the one that takes care of things by subscribing to this list: \n" + window.location.hostname +"/api/connectToList/" + self.listToShare()._id + "\n\nIf the link does nothing for you try loggin in to http://kaizen.menmo.se first and click the link again.\n\nNow go show that someone who is the real household hero!";
         else
             return "";
     }, this);

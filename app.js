@@ -190,14 +190,27 @@ http.createServer(app).listen(app.get('port'), function(){
   console.log('Equality listening on port ' + app.get('port'));
 });
 
+function getMillisecondsUntilTen(){
+	var now = new Date();
+	var millisTillTen = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 8, 0, 0, 0) - now;
+	if (millisTillTen <= 0) {
+	     millisTillTen += 86400000; // it's after 10am, try 10am tomorrow.
+	}
+	return millisTillTen;
+}
+
 function setupTimeout(){
 	setTimeout(function(){
 		Log.createLogEntry("running recurring tasks", "debug");
 		api.triggerRecurring();
 		setupTimeout();
-	}, 86400000); 
+	}, getMillisecondsUntilTen()); 
 };
 setupTimeout();
+
+//setTimeout(function(){}, getMillisecondsUntilTen());
+
+
 
 function ensureAuthenticated(req, res, next) {
     if (req.isAuthenticated()) { return next(); }

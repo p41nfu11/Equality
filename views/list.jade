@@ -51,9 +51,10 @@ block content
 			<!-- /ko -->	
 			<!-- ko if: $data.completingActive -->
 			tr
-				td
+				td(style="vertical-align: middle; line-height:100%;")
 					input(type='checkbox',data-bind='checked:completed,click:$parent.checkboxClicked')
-				td(colspan="3")
+				td(style="vertical-align: middle; line-height:100%;") Click one of the avatars to complete the task and award the points
+				td(colspan="2", style="min-width: 160px;")
 					<!-- ko foreach: $root.users -->
 					div(data-bind="click: function(){$root.completeTaskWithUser($parent, $data);}", style="display: inline-block; margin-right: 15px; text-align: center;")
 						img(data-bind="attr:{src: avatar}", style="width: 40px; height: 40px; border-radius:30px; border: 1px solid #000000; margin: 0 auto;")
@@ -175,9 +176,23 @@ block content
 				div(class="col-md-6 col-sm-6")
 					div(class="well")
 						img(data-bind="attr:{src: avatar}", style="border-radius:30px;border: 1px solid #000000;float:left;margin-right: 10px;")
+						div(style="float:right; display: block; width: 60px; height:60px; position: relative; margin-left: 15px; background-color: #bbbbbb; border-radius: 3px; text-align: center;")
+							div(class="label-success", style="float:right; display: block; width: 60px; position: absolute; bottom: 0px;", data-bind="style: { height: $parent.getPercentPointsForUser($data) + '%'}")
+							span(data-bind="text: $parent.getPercentPointsForUser($data) + '%'", style="bottom: 0px; position: absolute; width: 100%; color: #ffffff;")
+							span(style="bottom: -15px; position: absolute; width: 100%; font-size: 10px") Total
+						div(style="float:right; display: block; width: 60px; height:60px; position: relative; margin-left: 15px; background-color: #bbbbbb; border-radius: 3px; text-align: center;")
+							div(class="label-warning", style="float:right; display: block; width: 60px; position: absolute; bottom: 0px;", data-bind="style: { height: $parent.getWeekPercentPointsForUser($data) + '%'}")
+							span(data-bind="text: $parent.getMonthPercentPointsForUser($data) + '%'", style="bottom: 0px; position: absolute; width: 100%; color: #ffffff;")
+							span(style="bottom: -15px; position: absolute; width: 100%; font-size: 10px") This month
+						div(style="float:right; display: block; width: 60px; height:60px; position: relative; margin-left: 15px; background-color: #bbbbbb; border-radius: 3px; text-align: center;")
+							div(class="label-info",style="float:right; display: block; width: 60px; position: absolute; bottom: 0px;", data-bind="style: { height: $parent.getMonthPercentPointsForUser($data) + '%'}")
+							span(data-bind="text: $parent.getMonthPercentPointsForUser($data) + '%'", style="bottom: 0px; position: absolute; width: 100%; color: #ffffff;")
+							span(style="bottom: -15px; position: absolute; width: 100%; font-size: 10px") This week
 						span(data-bind="text: name", style="font-weight: bold;")
 						br
-						span(class="label label-warning glyphicon glyphicon-star",data-bind="text: $parent.getPointsForUser($data)")
+						span(class="label label-info glyphicon glyphicon-star",data-bind="text: $parent.getWeekPointsForUser($data)", style="margin-left: 1px;")
+						span(class="label label-warning glyphicon glyphicon-star",data-bind="text: $parent.getMonthPointsForUser($data)", style="margin-left: 1px;")
+						span(class="label label-success glyphicon glyphicon-star",data-bind="text: $parent.getPointsForUser($data)", style="margin-left: 1px;")
 						br
 						br
 						div(class='span6') <!--//, data-bind='visible: $parent.completedTasksMatrix()[$index].length > 0'-->	

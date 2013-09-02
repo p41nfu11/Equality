@@ -237,9 +237,55 @@ function ListViewModel() {
     }
 
     self.getPointsForUser = function(user){
+        return self.genericGetPointsForUser(user, new Date(0,0,0,0,0,0, 0));
+    }
+
+    
+    self.getPercentPointsForUser = function(user){
+        return Math.floor(self.getPointsForUser(user) / self.genericGetPoints(new Date(0,0,0,0,0,0, 0)) * 100);
+    }
+
+    self.getWeekPointsForUser = function(user){
+        return self.genericGetPointsForUser(user,self.getLastMondayDate());
+    }
+
+    self.getLastMondayDate = function(){
+        var now = new Date();
+        var daysToSubtract = (now.getDay() + 6 ) % 7;
+        return new Date( now.getFullYear(), now.getMonth(), now.getDate() - daysToSubtract, 0, 0, 0, 0);
+    }
+
+    self.getWeekPercentPointsForUser = function(user){
+        return Math.floor(self.getWeekPointsForUser(user) / self.genericGetPoints(self.getLastMondayDate()) * 100);
+    }
+    
+
+    self.getMonthPointsForUser = function(user){
+        var now = new Date();
+        return self.genericGetPointsForUser(user,new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0, 0));
+    }
+
+    self.getMonthPercentPointsForUser = function(user){
+        var now = new Date();
+        return Math.floor(self.getMonthPointsForUser(user) / self.genericGetPoints(new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0, 0)) * 100);
+    }
+
+    self.genericGetPointsForUser = function(user, fromDate){
+        var now = new Date();
         var points = 0;
         self.completedTasks().forEach(function(task){
-            if (task.completedBy === user._id){
+            if (task.completedBy === user._id && new Date(task.completedDate) >= fromDate){
+                points += task.points;
+            }
+        });
+        return points;
+    }
+
+    self.genericGetPoints = function(fromDate){
+        var now = new Date();
+        var points = 0;
+        self.completedTasks().forEach(function(task){
+            if (new Date(task.completedDate) >= fromDate){
                 points += task.points;
             }
         });

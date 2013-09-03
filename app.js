@@ -172,10 +172,13 @@ app.post('/api/removeList/', ensureAuthenticated, api.removeList);
 
 app.get('/fbauth', passport.authenticate('facebook', {scope:'email'}));
 
-app.get('/fbauthed', passport.authenticate('facebook',{ 
-  failureRedirect: '/',
-  successRedirect: '/lists'
-}));
+app.get('/fbauthed', passport.authenticate('facebook', {failureRedirect: '/'}), function(req,res){
+	console.log(req.session);
+	if (req.session.goto)
+		res.redirect(req.session.goto);
+	else
+		res.redirect('/lists');
+});
 
 app.get('/logout', function(req, res){
 	req.logOut();
@@ -208,12 +211,13 @@ function setupTimeout(){
 };
 setupTimeout();
 
-//setTimeout(function(){}, getMillisecondsUntilTen());
-
-
-
 function ensureAuthenticated(req, res, next) {
-    if (req.isAuthenticated()) { return next(); }
+    if (req.isAuthenticated()) { 
+    	return next(); 
+    }
+    if (req.url.length > 1)
+    	req.session.goto = req.url;
+    	
     res.redirect('/');
 };
 
@@ -223,6 +227,8 @@ function ensureAdmin(req, res, next) {
     		return next(); 	
     	}
     }
+    if (req.url.length > 1)
+    	req.session.goto = req.url;
     res.redirect('/');
 };
 

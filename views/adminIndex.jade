@@ -13,6 +13,8 @@ html
 					td
 						span(data-bind="text: title")
 					td
+						span(data-bind="text: _id.toString()")
+					td
 						table(data-bind="foreach: owners", style="border: 0;")
 							tr(style="border: 0;")
 								td(data-bind="text: name",style="border: 0;")

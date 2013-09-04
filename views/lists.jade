@@ -3,6 +3,7 @@ extends layout
 block content
 
 	script(type="text/html", id="listTemplate")
+		<!-- ko if: !removingList() -->
 		tr
 			td
 				a(data-bind="attr: { href: '/list/' + _id, title: title }")
@@ -11,8 +12,18 @@ block content
 				button(class="btn btn-xs", type="button", data-bind='click:$parent.share')
 					span(class="glyphicon glyphicon-share")
 			td
-				button(class='btn btn-xs',type='button', data-bind='click: $parent.removeList')
+				button(class='btn btn-xs',type='button', data-bind='click: $parent.removeListFirstClick')
 					span(class="glyphicon glyphicon-remove")
+		<!-- /ko -->
+		<!-- ko if: removingList -->
+		tr
+			td(colspan="2")
+				span Do you want to remove this list?
+			td
+				button(class="btn btn-danger", data-bind="click: $parent.removeList") Yes
+				&#32
+				button(class="btn btn-default", data-bind="click: $parent.cancelRemoveList") Cancel
+		<!-- /ko -->
 
 	div(class='container')
 		h2 Make something that counts..

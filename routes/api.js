@@ -329,9 +329,32 @@ exports.removeList = function(request, response){
 		    }
 		    else
 		    {
-		    	console.log('found one. Deleting...');
 		    	docs.forEach(function(doc){
-		    		doc.remove();
+		    		Log.createLogEntry("removeList: " + doc.title, "debug");
+
+	    			if (doc.owners.length > 1){
+	    				var mutated = false;
+    					for (var i = doc.owners.length -1; i >= 0; i--)
+    					{
+    						if (doc.owners[i].toString() == request.user._id.toString()){
+    							doc.owners.splice(i, 1);
+    							mutated = true;
+    						}
+    						console.log(doc.owners);
+    					}
+    					if (mutated){
+    						doc.save(function(err){
+								if(err){
+									Log.createLogEntry("removed owner from list: " + err, "error");
+									return;
+								}
+								Log.createLogEntry("owner was removed from list", "debug");
+							});	
+    					}
+	    			}
+	    			else{
+	    				doc.remove();
+	    			}		    		
 		    	});
 		    	response.send(200);
 		    }

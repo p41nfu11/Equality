@@ -18,6 +18,7 @@ function ListsViewModel() {
     self.init = function(){
     	$.get('/api/lists/', function(data) {
     		data.forEach(function (e){
+                e.removingList = ko.observable(false);
     			self.lists.push(e);	
     		});
     	});
@@ -26,6 +27,7 @@ function ListsViewModel() {
 	self.addListWasClicked = function(){
     	var newList = {title: self.title, createdDate: new Date()};
     	$.post('/api/list/', newList, function(res, err) {
+            res.removingList = ko.observable(false);
     		self.lists.push(res);
     		self.title('');
 		});	
@@ -35,27 +37,35 @@ function ListsViewModel() {
         $.post('/api/listAddOwner/', {listId: self.listToJoin()}, function(res, err) {
             self.listToJoin('');
         });
-    }
+    };
+
+    self.removeListFirstClick = function(rList){
+        rList.removingList(true);
+    };
+
+    self.cancelRemoveList = function(rList){
+        rList.removingList(false);
+    };
 
     self.removeList = function(rList){
+        rList.removingList(false);
         $.post('/api/removeList/', rList, function(removedList, err) {
-            
                 var index = self.lists.indexOf(rList);
                 self.lists.splice(index, 1);
         
         });
-    }
+    };
 
     self.sendInvite = function(){
         var share = {'listToShare': self.listToShare()._id, 'mailTo': self.mailTo(), 'mailContent': self.mailContent()};
         $.post('/api/sendInvite/', share, function(response) {
             self.listToShare(undefined);
         });
-    }
+    };
 
     self.share = function(clickedList){
         self.listToShare(clickedList);
-    }
+    };
 
     self.init();
 

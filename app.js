@@ -174,10 +174,14 @@ app.get('/fbauth', passport.authenticate('facebook', {scope:'email'}));
 
 app.get('/fbauthed', passport.authenticate('facebook', {failureRedirect: '/'}), function(req,res){
 	console.log(req.session);
-	if (req.session.goto)
-		res.redirect(req.session.goto);
-	else
+	if (req.session.goto && req.session.goto.length > 1){
+		var goto = req.session.goto;
+		req.session.goto = '';
+		res.redirect(goto);
+		}
+	else{
 		res.redirect('/lists');
+		}
 });
 
 app.get('/logout', function(req, res){

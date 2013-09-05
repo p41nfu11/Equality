@@ -3,6 +3,7 @@ function AdminViewModel() {
 
     self.lists = ko.observableArray();
     self.logEntries = ko.observableArray();
+    self.recurringTasks = ko.observableArray();
 
     $.get('/admin/lists/', function(listsData) {
         listsData.forEach(function (list){
@@ -13,6 +14,12 @@ function AdminViewModel() {
     $.get('/admin/log/', function(log) {
         log.forEach(function (entry){
             self.logEntries.push(entry);
+        });
+    }); 
+
+    $.get('/admin/recurringtasks/', function(rtasks) {
+        rtasks.forEach(function (task){
+            self.recurringTasks.push(task);
         });
     }); 
 };

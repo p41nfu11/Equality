@@ -1,6 +1,7 @@
 var list = require('../models/list');
 var task = require('../models/task');
 var User = require('../models/user');
+var RecurringTask = require('../models/recurringtask');
 var LogEntry = require('../models/logentry');
 
 exports.adminIndex = function(req, res){
@@ -14,6 +15,17 @@ exports.lists = function(req, res){
 			if(err)
 				console.log(err);
 			res.send(lists);
+		});
+	});
+};
+
+exports.recurringTasks = function(req, res){
+  	process.nextTick(function(){
+		var query = RecurringTask.find({}).sort({createdDate: -1}).limit(20).populate('list');
+		query.exec(function(err, recurringTasks){
+			if(err)
+				console.log(err);
+			res.send(recurringTasks);
 		});
 	});
 };

@@ -111,6 +111,8 @@ app.get('/lists', ensureAuthenticated, routes.lists);
 app.get('/admin', ensureAdmin, admin.adminIndex);
 app.get('/admin/lists/', ensureAdmin, admin.lists);
 app.get('/admin/log/', ensureAdmin, admin.log);
+app.get('/admin/recurringtasks/', ensureAdmin, admin.recurringTasks);
+
 
 
 app.post('/api/list/', ensureAuthenticated, api.addList);

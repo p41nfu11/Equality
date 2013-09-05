@@ -114,7 +114,7 @@ block content
 							button(data-bind='click:function(){addTaskWasClicked()}, enable: points() && title()', class='btn') Add
 						<!-- /ko -->
 					div(class="well")
-						h4 Add a recurring task <button class="btn btn-default btn-xs" style="float:right;" data-bind="click: function(){addRecurringTaskViewActive(!addRecurringTaskViewActive());}"><span class="glyphicon" data-bind="css: {'glyphicon-collapse-up': addRecurringTaskViewActive, 'glyphicon-collapse-down': !addRecurringTaskViewActive()}"></span></button>
+						h4 Setup recurring tasks <button class="btn btn-default btn-xs" style="float:right;" data-bind="click: function(){addRecurringTaskViewActive(!addRecurringTaskViewActive());}"><span class="glyphicon" data-bind="css: {'glyphicon-collapse-up': addRecurringTaskViewActive, 'glyphicon-collapse-down': !addRecurringTaskViewActive()}"></span></button>
 						<!-- ko if: addRecurringTaskViewActive -->
 						form(class='form')
 							div(class="form-group")
@@ -132,6 +132,7 @@ block content
 										span(class="btn", data-bind="css:{'btn-default': recurringTaskPoints() !== 64, 'btn-success': recurringTaskPoints() === 34}, click: function(){self.recurringTaskPoints(34);}") 34
 										span(class="btn btn-warning glyphicon glyphicon-star", disabled="disabled")
 							div(class="form-group")
+								label create this task every n days
 								div(class="input-group")
 									div(class="btn-group btn-group-sm")
 										span(class="btn", data-bind="css:{'btn-default': recurringTaskInterval() !== 1, 'btn-success': recurringTaskInterval() === 1}, click: function(){self.recurringTaskInterval(1);}") 1

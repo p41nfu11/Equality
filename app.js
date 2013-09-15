@@ -145,13 +145,13 @@ app.get('/api/recurringTasks/:id', ensureAuthenticated, api.getRecurringTasksByL
 app.get('/api/randomTasks/', ensureAuthenticated, api.randomTasks);
 
 app.post('/api/sendInvite/', ensureAuthenticated, function(request, response) {
-	console.log(request.body);
+	Log.createLogEntry("Sending invite to " + request.body.mailTo, "debug");
 	mandrill('/messages/send', {
     message: {
         to: [{email: request.body.mailTo, name: ''}],
-        from_email: config.dev.mandrill.fromMail,
+        from_email: request.user.email,
         subject: "Get Equal!",
-        text: request.body.mailContent
+        text: "Dear whatsyourname\n\n"+ request.user.name +" wants to equal out your relationship by sharing this EquallyDo list with you. Show " + request.user.name+" that you are the one that takes care of things by subscribing to this list: \n" + window.location.hostname +"/api/connectToList/" + self.listToShare()._id
     }
 }, function(error, response)
 {

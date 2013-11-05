@@ -145,6 +145,7 @@ app.get('/api/recurringTasks/:id', ensureAuthenticated, api.getRecurringTasksByL
 app.get('/api/randomTasks/', ensureAuthenticated, api.randomTasks);
 
 app.post('/api/sendInvite/', ensureAuthenticated, function(request, response) {
+	Log.createLogEntry("Body " + request.body, "debug");
 	Log.createLogEntry("Sending invite to " + request.body.mailTo, "debug");
 	mandrill('/messages/send', {
     message: {

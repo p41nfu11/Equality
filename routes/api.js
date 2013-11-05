@@ -212,7 +212,7 @@ exports.listConnectToUser = function (request, response) {
 			if(list.owners.indexOf(userId) > -1)
 			{
 				Log.createLogEntry('user: ' + userId + ' is already added to this list ' + list.title, "debug");	
-				res.redirect('/');
+				response.redirect('/');
 				return;
 			}	
 			list.owners.push(userId);
@@ -223,7 +223,7 @@ exports.listConnectToUser = function (request, response) {
 					return;
 				}
 				console.log("list " + list.title + " was saved");
-				res.redirect('/');
+				response.redirect('/');
 			});	
 		});
 	});

@@ -242,7 +242,8 @@ function ListViewModel() {
 
     
     self.getPercentPointsForUser = function(user){
-        return Math.floor(self.getPointsForUser(user) / self.genericGetPoints(new Date(0,0,0,0,0,0, 0)) * 100);
+        var percent = Math.floor(self.getPointsForUser(user) / self.genericGetPoints(new Date(0,0,0,0,0,0, 0)) * 100)
+        return isNaN(percent)? 0: percent;
     }
 
     self.getWeekPointsForUser = function(user){
@@ -256,7 +257,8 @@ function ListViewModel() {
     }
 
     self.getWeekPercentPointsForUser = function(user){
-        return Math.floor(self.getWeekPointsForUser(user) / self.genericGetPoints(self.getLastMondayDate()) * 100);
+        var percent = Math.floor(self.getWeekPointsForUser(user) / self.genericGetPoints(self.getLastMondayDate()) * 100);
+        return isNaN(percent)? 0: percent;
     }
     
 
@@ -267,7 +269,8 @@ function ListViewModel() {
 
     self.getMonthPercentPointsForUser = function(user){
         var now = new Date();
-        return Math.floor(self.getMonthPointsForUser(user) / self.genericGetPoints(new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0, 0)) * 100);
+        var percent = Math.floor(self.getMonthPointsForUser(user) / self.genericGetPoints(new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0, 0)) * 100);
+        return isNaN(percent)? 0: percent;
     }
 
     self.genericGetPointsForUser = function(user, fromDate){

@@ -178,15 +178,15 @@ block content
 					div(class="well")
 						img(data-bind="attr:{src: avatar}", style="border-radius:30px;border: 1px solid #000000;float:left;margin-right: 10px;")
 						div(style="float:right; display: block; width: 60px; height:60px; position: relative; margin-left: 15px; background-color: #bbbbbb; border-radius: 3px; text-align: center;")
-							div(class="label-success", style="float:right; display: block; width: 60px; position: absolute; bottom: 0px;", data-bind="style: { height: $parent.getPercentPointsForUser($data) + '%'}")
+							div(class="label-success", style="float:right; display: block; width: 60px; position: absolute; bottom: 0px; left:0px;", data-bind="style: { height: $parent.getPercentPointsForUser($data) + '%'}")
 							span(data-bind="text: $parent.getPercentPointsForUser($data) + '%'", style="bottom: 0px; position: absolute; width: 100%; color: #ffffff;")
 							span(style="bottom: -15px; position: absolute; width: 100%; font-size: 10px") Total
 						div(style="float:right; display: block; width: 60px; height:60px; position: relative; margin-left: 15px; background-color: #bbbbbb; border-radius: 3px; text-align: center;")
-							div(class="label-warning", style="float:right; display: block; width: 60px; position: absolute; bottom: 0px;", data-bind="style: { height: $parent.getMonthPercentPointsForUser($data) + '%'}")
+							div(class="label-warning", style="float:right; display: block; width: 60px; position: absolute; bottom: 0px; left:0px;", data-bind="style: { height: $parent.getMonthPercentPointsForUser($data) + '%'}")
 							span(data-bind="text: $parent.getMonthPercentPointsForUser($data) + '%'", style="bottom: 0px; position: absolute; width: 100%; color: #ffffff;")
 							span(style="bottom: -15px; position: absolute; width: 100%; font-size: 10px") This month
 						div(style="float:right; display: block; width: 60px; height:60px; position: relative; margin-left: 15px; background-color: #bbbbbb; border-radius: 3px; text-align: center;")
-							div(class="label-info",style="float:right; display: block; width: 60px; position: absolute; bottom: 0px;", data-bind="style: { height: $parent.getWeekPercentPointsForUser($data) + '%'}")
+							div(class="label-info",style="float:right; display: block; width: 60px; position: absolute; bottom: 0px; left:0px;", data-bind="style: { height: $parent.getWeekPercentPointsForUser($data) + '%'}")
 							span(data-bind="text: $parent.getWeekPercentPointsForUser($data) + '%'", style="bottom: 0px; position: absolute; width: 100%; color: #ffffff;")
 							span(style="bottom: -15px; position: absolute; width: 100%; font-size: 10px") This week
 						span(data-bind="text: name", style="font-weight: bold;")

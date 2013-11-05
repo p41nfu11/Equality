@@ -57,7 +57,7 @@ function ListsViewModel() {
     };
 
     self.sendInvite = function(){
-        var share = {'listToShare': self.listToShare()._id, 'mailTo': self.mailTo(), 'mailContent': self.mailContent()};
+        var share = {'listToShare': self.listToShare()._id, 'mailTo': self.mailTo(), 'mailContent': ''};
         $.post('/api/sendInvite/', share, function(response) {
             self.listToShare(undefined);
         });

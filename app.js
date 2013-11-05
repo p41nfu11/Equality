@@ -145,14 +145,13 @@ app.get('/api/recurringTasks/:id', ensureAuthenticated, api.getRecurringTasksByL
 app.get('/api/randomTasks/', ensureAuthenticated, api.randomTasks);
 
 app.post('/api/sendInvite/', ensureAuthenticated, function(request, response) {
-	Log.createLogEntry("Body " + JSON.stringify(request.body), "debug");
 	Log.createLogEntry("Sending invite to " + JSON.stringify(request.body.mailTo), "debug");
 	mandrill('/messages/send', {
     message: {
         to: [{email: request.body.mailTo, name: ''}],
         from_email: request.user.email,
         subject: "Get Equal!",
-        text: "Dear whatsyourname\n\n"+ request.user.name +" wants to equal out your relationship by sharing this EquallyDo list with you. Show " + request.user.name+" that you are the one that takes care of things by subscribing to this list: \n http://equallydo.com/api/connectToList/" + request.body.listToShare + "\n\nBest regards\n\nThe EquallyDo team"
+        text: "Dear whatsyourname\n\n"+ request.user.name +" wants to equal out your relationship by sharing this EquallyDo list with you. Show " + request.user.name+" that you take care of things by subscribing to this list: \n http://equallydo.com/api/connectToList/" + request.body.listToShare + "\n\nBest regards\n\nThe EquallyDo team"
     }
 }, function(error, response)
 {
